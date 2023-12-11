@@ -17,13 +17,12 @@ app.use(cors());
 
 app.use("/", async (req, res, next) => {
   console.log("new req");
-  await db
-    .collection("logs")
-    .add({
-      ip: req.headers["true-client-ip"],
-      timestamp: new Date(),
-      headers: req.headers,
-    });
+  await db.collection("logs").add({
+    ip: req.headers["true-client-ip"],
+    timestamp: new Date(),
+    headers: req.headers,
+    country: req.headers["cf-ipcountry"],
+  });
   app.use(express.static(path.resolve(__dirname, "./static")));
   next();
 });
