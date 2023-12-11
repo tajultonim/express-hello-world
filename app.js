@@ -1,6 +1,29 @@
 const express = require("express");
+const path = require("path");
 const app = express();
 const port = process.env.PORT || 3001;
+var admin = require("firebase-admin");
+var cors = require("cors");
+
+
+var serviceAccount = require("./test-ttajul-firebase-adminsdk-jw892-720bfc2db9.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const db = admin.firestore();
+app.use(express.json());
+app.use(cors());
+
+app.use("/", async (req, res, next) => {
+  console.log("new req");
+  await db
+    .collection("logs")
+    .add({ ip: req.ip, timestamp: new Date(), headers: req.headers });
+  app.use(express.static(path.resolve(__dirname, "./static")));
+  next();
+});
 
 app.get("/", (req, res) => res.type('html').send(html));
 
