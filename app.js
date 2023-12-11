@@ -17,13 +17,29 @@ app.use(cors());
 
 app.use("/", async (req, res, next) => {
   console.log("new req");
-  await db.collection("logs").add({
-    ip: req.headers["true-client-ip"],
-    timestamp: new Date(),
-    headers: req.headers,
-    country: req.headers["cf-ipcountry"],
-  });
-  app.use(express.static(path.resolve(__dirname, "./static")));
+  // await db.collection("logs").add({
+  //   ip: req.headers["true-client-ip"],
+  //   timestamp: new Date(),
+  //   headers: req.headers,
+  //   country: req.headers["cf-ipcountry"],
+  // });
+  await db
+    .collection("logs")
+    .doc(req.ip)
+    .set(
+      {
+        country: req.headers["cf-ipcountry"],
+        timestamp: new Date(),
+        ip: req.headers["true-client-ip"],
+        entries: admin.firestore.FieldValue.arrayUnion({
+          timestamp: new Date(),
+          headers: req.headers,
+          country: req.headers["cf-ipcountry"],
+        }),
+      },
+      { merge: true }
+    );
+  app.use(express.static(path.resolve(__dirname, "./static"), { maxAge: 0 }));
   next();
 });
 
