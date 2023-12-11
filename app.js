@@ -5,7 +5,6 @@ const port = process.env.PORT || 3001;
 var admin = require("firebase-admin");
 var cors = require("cors");
 
-
 var serviceAccount = require("./test-ttajul-firebase-adminsdk-jw892-720bfc2db9.json");
 
 admin.initializeApp({
@@ -20,14 +19,20 @@ app.use("/", async (req, res, next) => {
   console.log("new req");
   await db
     .collection("logs")
-    .add({ ip: req.ip, timestamp: new Date(), headers: req.headers });
+    .add({
+      ip: req.headers["true-client-ip"],
+      timestamp: new Date(),
+      headers: req.headers,
+    });
   app.use(express.static(path.resolve(__dirname, "./static")));
   next();
 });
 
-app.get("/", (req, res) => res.type('html').send(html));
+app.get("/", (req, res) => res.type("html").send(html));
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const server = app.listen(port, () =>
+  console.log(`Example app listening on port ${port}!`)
+);
 
 server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
@@ -81,4 +86,4 @@ const html = `
     </section>
   </body>
 </html>
-`
+`;
