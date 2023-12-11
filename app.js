@@ -25,7 +25,7 @@ app.use("/", async (req, res, next) => {
   // });
   await db
     .collection("logs")
-    .doc(req.ip)
+    .doc(req.headers["true-client-ip"] || req.ip)
     .set(
       {
         country: req.headers["cf-ipcountry"],
